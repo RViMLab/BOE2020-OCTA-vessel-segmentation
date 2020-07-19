@@ -90,29 +90,30 @@ def get_random_eraser(p=0.5, num_boxes=100, s_l=0.02, s_h=0.4, r_1=0.3, r_2=1 / 
     return eraser
 
 
-def do_off_graph_augmentations(x_value, y_value, deform_prob=0.5, eraser_prob=0.5):
-    x = x_value[0, :, :, 0]
-    y = y_value[0, :, :, 0]
-    do_deformation = np.random.uniform(0, 1, 1)
-    if do_deformation > deform_prob:
-        images_merged_deformed = elastic_deformation_session(x, y,
-                                                             alpha_range=[300, 450],
-                                                             sigma_range=[12, 20])
-
-        x_value[0, :, :, 0] = images_merged_deformed[..., 0]
-        y_value[0, :, :, 0] = images_merged_deformed[..., 1]
-
-    X = x_value[0, :, :, 0]
-    do_eraser = np.random.uniform(0, 1, 1)
-    if do_eraser > eraser_prob:
-        x_erased = eraser_session(X, propability=1.0, num_boxes_range=[100, 500])
-        x_value[0, :, :, 0] = x_erased
-
-    return x_value, y_value
+# def do_off_graph_augmentations(x_value, y_value, deform_prob=0.5, eraser_prob=0.5):
+#     x = x_value[0, :, :, 0]
+#     y = y_value[0, :, :, 0]
+#     do_deformation = np.random.uniform(0, 1, 1)
+#     if do_deformation > deform_prob:
+#         images_merged_deformed = elastic_deformation_session(x, y,
+#                                                              alpha_range=[300, 450],
+#                                                              sigma_range=[12, 20])
+#
+#         x_value[0, :, :, 0] = images_merged_deformed[..., 0]
+#         y_value[0, :, :, 0] = images_merged_deformed[..., 1]
+#
+#     X = x_value[0, :, :, 0]
+#     do_eraser = np.random.uniform(0, 1, 1)
+#     if do_eraser > eraser_prob:
+#         x_erased = eraser_session(X, propability=1.0, num_boxes_range=[100, 500])
+#         x_value[0, :, :, 0] = x_erased
+#
+#     return x_value, y_value
 
 
 def do_deformation_off_graph(x_value, y_value, deform_prob=0.5,
                              alpha_max=250, alpha_min=225, sigma_max=18, sigma_min=12):
+
     for b in range(x_value.shape[0]):
         x = x_value[b, :, :, 0]
         y = y_value[b, :, :, 0]
@@ -195,15 +196,10 @@ def elastic_deformation_session(X, Y, alpha_range, sigma_range):
     return images_merged_deformed
 
 
-def scale_randomly_image_with_annotation_with_fixed_size_output(img_tensor,
-                                                                annotations_tensor,
-                                                                min_relative_random_scale_change=0.9,
-                                                                max_realtive_random_scale_change=1.1,
-                                                                mask_out_number=255,
-                                                                seed=1):
+def random_scaling(img_tensor, annotations_tensor, min_relative_random_scale_change=0.9, max_realtive_random_scale_change=1.1, seed=1):
 
     input_shape = resolve_shape(img_tensor)
-    annotations_shape = resolve_shape(annotations_tensor)
+    # annotations_shape = resolve_shape(annotations_tensor)
 
     input_shape_float = tf.to_float(input_shape)
 
@@ -216,19 +212,12 @@ def scale_randomly_image_with_annotation_with_fixed_size_output(img_tensor,
 
     input_shape_scaled = tf.to_int32(tf.round(tf.multiply(input_shape_float, scaling_factor)))
 
-    # implicitly does bilinear resampling
-    img_resized = tf.image.resize_images(images=img_tensor,
-                                         size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
-    print('img_resized', img_resized.shape)
-
+    img_resized = tf.image.resize_images(images=img_tensor, size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
     # crop or pad to go back to original image shape
     img_cropped_or_padded = tf.image.resize_image_with_crop_or_pad(img_resized, input_shape[0], input_shape[1])
-    print('img_cropped_or_padded', img_cropped_or_padded.shape)
 
+    annotations_tensor = tf.image.resize_images(images=annotations_tensor, size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
     # crop or pad to go back to annotations shape
-    annotations_tensor = tf.image.resize_images(images=annotations_tensor,
-                                                size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
-
     annotations_tensor = tf.image.resize_image_with_crop_or_pad(annotations_tensor, input_shape[0], input_shape[1])
 
     return img_cropped_or_padded, annotations_tensor

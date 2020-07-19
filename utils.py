@@ -179,7 +179,7 @@ def track_mean_value_per_epoch(i, loss_value, epoch_step, epoch, values_list, su
         if i % epoch_step == 0:
             epoch += 1
             cost_mean = np.mean(np.array(values_list))
-            print('Epoch [{}]: mean loss_T : {}'.format(epoch, cost_mean))
+            print('Epoch [{}]: mean loss : {}'.format(epoch, cost_mean))
             values_list = []
             summary = tf.Summary()
             summary.value.add(tag=tag, simple_value=cost_mean)
@@ -219,8 +219,8 @@ def make_learning_rate_sceduler(lr_schedule_type, lr_start, global_step, decay_s
                                                         decay_steps=decay_steps,
                                                         decay_rate=decay_rate,
                                                         staircase=True)
-        elif lr_schedule_type == 'exponential':
-            raise NotImplementedError
+        else:
+            raise NotImplementedError()
 
         learning_rate_summary = tf.summary.scalar('learning_rate'.format(lr_schedule_type + '_decay'), learning_rate)
         return learning_rate, learning_rate_summary

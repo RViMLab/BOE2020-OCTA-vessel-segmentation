@@ -49,6 +49,7 @@ class VggEncoder:
         self.vgg_id = vgg_id
         self.reuse = False
         self.cutoff = cutoff
+
     def __call__(self, x, purpose, requested_vgg_feature_maps=None, multiply_by255=True, verbose=False):
         """
         *255, mean subtraction, and GRAY->RGB->BGR are done internally!!

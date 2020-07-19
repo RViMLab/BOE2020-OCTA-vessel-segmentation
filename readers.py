@@ -1,8 +1,6 @@
 import tensorflow as tf
-from augmentations import scale_randomly_image_with_annotation_with_fixed_size_output as scale_random
-from augmentations import do_eraser_off_graph, do_deformation_off_graph
+from augmentations import random_scaling
 from utils import identity_on_tensors
-from ops import resolve_shape
 from collections import OrderedDict
 
 
@@ -97,8 +95,8 @@ class Reader:
         with tf.name_scope('random_scaling'):
             do_scaling = tf.random_uniform([1, 1], minval=0, maxval=1, dtype=tf.float32, seed=seed)
             image, mask = tf.cond(do_scaling[0][0] > 1-self.augmentation_details['scaling_prob'],
-                                  lambda: scale_random(image, mask, min_relative_random_scale_change=self.augmentation_details['scaling_min'],
-                                                       max_realtive_random_scale_change=self.augmentation_details['scaling_max'], seed=seed),
+                                  lambda: random_scaling(image, mask, min_relative_random_scale_change=self.augmentation_details['scaling_min'],
+                                                         max_realtive_random_scale_change=self.augmentation_details['scaling_max'], seed=seed),
                                   lambda: identity_on_tensors(image, mask))
 
         return image, mask

@@ -7,16 +7,19 @@ This repository contains a Python3 Tensorflow implementation of the methods desc
    - [Scipy][scpy] 
    - [Opencv3][cv2] (used only for storing and reading images)
    - [matplotlib][plt] (used only for segmentation visualization)
-   - [vgg19 pretrained weights][vgg19] (these are required only for using a perceptual loss, must be in the path)
+   - [vgg19 pretrained weights][vgg19] (these are required only for computing a perceptual loss, must be downloaded and extracted)
    
 ## Contents
 * Pretrained model weights and code to perform vessel segmentation which can be used on OCTA images. 
-* Demostration of results on diverse publicly available OCT-A images including images of different devices and montages.
+* Demostration of results on unseen publicly available OCT-A images including montages of multiple images and images captured with different commercial scanners.
 * Code for defining all models and loss functions and training as described in the paper.
+* Demonstration of the iterative refinement effect achieved by iUNET on unseen images (please see 'segmentation_iunet' directory)
 
-## Examples
-* A commented example of how to use the pretrained models is provided in example_use_pretrained.py.
-* An example of how to define and train the models is provided in example_use_train.py.
+## Usages-examples
+* A commented example of how to use the pretrained models is provided in 'example_use_pretrained.py'.
+* An example of how to define and train the models is provided in 'example_use_train.py'. 
+* Loss functions and network definitions can be found in 'losses.py' and 'networks.py' respectively 
+
 
 [tf]: https://www.tensorflow.org/install/pip
 [np]: https://numpy.org/
@@ -25,8 +28,8 @@ This repository contains a Python3 Tensorflow implementation of the methods desc
 [plt]: https://matplotlib.org/
 [link_to_paper]: https://www.osapublishing.org/boe/viewmedia.cfm?uri=boe-11-5-2490&seq=0
 [vgg19]: http://download.tensorflow.org/models/vgg_19_2016_08_28.tar.gz
-## Citation
 
+## Citation
 If you use this code in your work, please kindly cite [Pissas et al. (2020)][link_to_paper]:
 * Pissas et al., [Deep iterative vessel segmentation in OCT angiography][link_to_paper], Biomedical Optics Express Vol. 11, Issue 5, pp. 2490-2510 (2020)  DOI: https://doi.org/10.1364/BOE.384919.
 
@@ -49,14 +52,12 @@ BibTeX entry:
 }
 ```
 
-## Licensing and copyright
-
-Copyright (c) 2015-7, [University College London][ucl]
+## Licensing and copyright 
 
 Please see the LICENSE file for details.
 
 Other licences may apply for the GIFT-Grab dependencies.
-Please see the [dependency installation guidelines][gg-tips] for the implications of using them with regards to licensing.
+Please see the for the implications of using them with regards to licensing.
 There will be copyright in the Optical Flow software which doesn’t need active registration.
 You should ensure that there is a copyright statement in the software’s remarks and documentation, e.g. © 2020, King’s College London.
 Depending upon the origin of routines, libraries etc. used in the software’s development it might also be necessary to include other copyright statements.
@@ -69,7 +70,6 @@ If anyone would like to explore using the software in commercial research, clini
 making commercial use of it they should contact you initially (and we can then discuss with the party what they wish
 to do and agree a royalty-bearing licence if appropriate, or explore a funded research collaboration).
 
-http://download.tensorflow.org/models/vgg_19_2016_08_28.tar.gz
 ## Acknowledgements
 [nihr]: http://www.nihr.ac.uk/
 [erc]: https://erc.europa.eu/
