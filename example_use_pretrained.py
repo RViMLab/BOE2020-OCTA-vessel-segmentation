@@ -1,12 +1,20 @@
 from manager import ModelManager
 
-# 1) choose a pretrained model (we choose the best performing iUNET,
-# note: the directory's naming convention reflects the settings of the pretrained model)
+# 1) choose a pretrained model
+
+# note: the directory's naming convention reflects the settings of the pretrained model
+# for example we choose our top-performing method based on iUNET
+
 model_ckpt_dir = 'pretrained_models/iUNET/L_3_F_64_loss_i-bce-topo_C1_2_C2_2_C3_4_0.01_0.001_0.0001_iters_4'
 
 # 2) choose a directory where octa images are stored
+
 # here we use a directory containing publicly available images downloaded for demonstration purposes
-# see results in the 'segmentations_iunet' directory
+# These images are not used for training and present significant differences compared to our training data:
+# scale, imaging device, being a montage of two or more seperate scans
+# Our model generalizes reasonably well on these unseen images,
+# please see results in the 'segmentations_iunet' directory
+
 path_to_files = 'web_octa_images'
 
 # 3) define the model's graph using the manager object:

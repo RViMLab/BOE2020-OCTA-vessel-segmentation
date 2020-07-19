@@ -15,8 +15,8 @@ This repository contains a Python3 Tensorflow implementation of the methods desc
 ## Examples
 * A commented example of how to use the pretrained models is provided in example_use_pretrained.py.
 
-
-* For training an example is provided in example_use_train.py
+* An example for defining and training the models is provided in example_use_train.py.
+For using 
 
 [tf]: https://www.tensorflow.org/install/pip
 [np]: https://numpy.org/

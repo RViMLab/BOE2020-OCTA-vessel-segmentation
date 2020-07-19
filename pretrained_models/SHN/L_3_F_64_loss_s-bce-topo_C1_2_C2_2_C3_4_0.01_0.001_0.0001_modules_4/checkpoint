@@ -1,0 +1,6 @@
+model_checkpoint_path: "SHN_3960.ckpt"
+all_model_checkpoint_paths: "SHN_1800.ckpt"
+all_model_checkpoint_paths: "SHN_2160.ckpt"
+all_model_checkpoint_paths: "SHN_2280.ckpt"
+all_model_checkpoint_paths: "SHN_3300.ckpt"
+all_model_checkpoint_paths: "SHN_3960.ckpt"
