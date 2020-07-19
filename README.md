@@ -1,22 +1,22 @@
 # BOE2020 OCTA vessel segmentation
 This repository contains a Python3 Tensorflow implementation of the methods described in 'Deep iteratitive vessel segmentation in OCT angiography'.
 
-##Dependencies
+## Dependencies
    - [Tensorflow 1.9.0][tf] (the code should be compatible with any 1.x version of tensorflow).
    - [Numpy][np]
    - [Scipy][scpy] 
    - [Opencv3][cv2] (used only for storing and reading images)
    - [matplotlib][plt] (used only for segmentation visualization)
+   - [vgg19 pretrained weights][vgg19] (these are required only for using a perceptual loss, must be in the path)
    
 ## Contents
-* Pretrained model weights and code to perform vessel segmentation on OCTA images. 
-* Code for defining and training all models and loss functions described in the paper.
+* Pretrained model weights and code to perform vessel segmentation which can be used on OCTA images. 
+* Demostration of results on diverse publicly available OCT-A images including images of different devices and montages.
+* Code for defining all models and loss functions and training as described in the paper.
 
 ## Examples
 * A commented example of how to use the pretrained models is provided in example_use_pretrained.py.
-
-* An example for defining and training the models is provided in example_use_train.py.
-For using 
+* An example of how to define and train the models is provided in example_use_train.py.
 
 [tf]: https://www.tensorflow.org/install/pip
 [np]: https://numpy.org/
@@ -24,7 +24,7 @@ For using
 [cv2]: https://opencv.org/
 [plt]: https://matplotlib.org/
 [link_to_paper]: https://www.osapublishing.org/boe/viewmedia.cfm?uri=boe-11-5-2490&seq=0
-
+[vgg19]: http://download.tensorflow.org/models/vgg_19_2016_08_28.tar.gz
 ## Citation
 
 If you use this code in your work, please kindly cite [Pissas et al. (2020)][link_to_paper]:
