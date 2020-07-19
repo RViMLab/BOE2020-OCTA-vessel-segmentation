@@ -10,7 +10,7 @@ This repository contains a Python3 Tensorflow implementation of the methods desc
    - [vgg19 pretrained weights][vgg19] (these are required only for computing a perceptual loss, must be downloaded and extracted)
    
 ## Contents
-* Pretrained model weights and code to perform vessel segmentation which can be used on OCTA images. 
+* Pretrained model weights and code to perform vessel segmentation on OCTA images. 
 * Demostration of results on unseen publicly available OCT-A images including montages of multiple images and images captured with different commercial scanners.
 * Code for defining all models and loss functions and training as described in the paper.
 * Demonstration of the iterative refinement effect achieved by iUNET on unseen images (please see 'segmentation_iunet' directory)
