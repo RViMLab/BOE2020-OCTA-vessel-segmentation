@@ -1,0 +1,6 @@
+model_checkpoint_path: "iUNET_1440.ckpt"
+all_model_checkpoint_paths: "iUNET_360.ckpt"
+all_model_checkpoint_paths: "iUNET_660.ckpt"
+all_model_checkpoint_paths: "iUNET_780.ckpt"
+all_model_checkpoint_paths: "iUNET_1080.ckpt"
+all_model_checkpoint_paths: "iUNET_1440.ckpt"

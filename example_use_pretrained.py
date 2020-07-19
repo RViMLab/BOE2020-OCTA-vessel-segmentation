@@ -1,0 +1,34 @@
+from manager import ModelManager
+
+# 1) choose a pretrained model (we choose the best performing iUNET,
+# note: the directory's naming convention reflects the settings of the pretrained model)
+model_ckpt_dir = 'pretrained_models/iUNET/L_3_F_64_loss_i-bce-topo_C1_2_C2_2_C3_4_0.01_0.001_0.0001_iters_4'
+
+# 2) choose a directory where octa images are stored
+# here we use a directory containing publicly available images downloaded for demonstration purposes
+# see results in the 'segmentations_iunet' directory
+path_to_files = 'web_octa_images'
+
+# 3) define the model's graph using the manager object:
+#   a) the num_layers argument controls the number of residual blocks the encoder and decoder consists of
+#   b) the feature_maps_root argument controls the number filters in the first residual block of the encoder
+#   The two above arguments should match the pretrained model's settings.
+#   c) Also specify the number of refinement iterations of the iUNET by setting n_iterations
+# note: for the iUNET model this can be set to any arbitrary value higher or lower than the one used during training.
+# For this example n_iterations was 4 during training but we can set n_iterations = 6
+# in the hope that further refinement iterations improve the segmentation
+manager = ModelManager(name='iUNET', n_iterations=6, num_layers=3, feature_maps_root=64)
+
+# 4) choose if intermediate outputs are computed by setting get_intermediate_outputs=True, path_to_save_dir=None)
+#    choose if the outputs are visualized during execution by setting show_outputs=True
+#    choose if the outputs are stored in a directory specified by path_to_save_dir (e.x segmentations_iunet)
+#    note: either all if get_intermediate_outputs=True else just the final output is stored
+#    if the path_to_save_dir argument is not specified no output is saved (defaults to None)
+manager.run_on_images(path_to_files, model_ckpt_dir, get_intermediate_outputs=True, show_outputs=True, path_to_save_dir='segmentations_iunet')
+
+########################################################################################################################
+
+# for the SHN pretrained model with n_modules = 4 we would need the following 3 lines of code:
+# model_ckpt_dir = 'pretrained_models/SHN/L_3_F_64_loss_s-bce-topo_C1_2_C2_2_C3_4_0.01_0.001_0.0001_modules_4'
+# manager = ModelManager(name='SHN', n_modules=4, num_layers=3, feature_maps_root=64)
+# manager.run_on_images(path_to_files, model_ckpt_dir, get_intermediate_outputs=True, show_outputs=True, path_to_save_dir='segmentations_shn')
