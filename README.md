@@ -11,17 +11,17 @@ This repository contains a Python3 Tensorflow implementation of the methods desc
    - [vgg19 pretrained weights][vgg19] (required only for computing a perceptual loss, must be downloaded and extracted)
    
 ## Contents
-* Pretrained model weights and code to perform vessel segmentation on OCTA images. Specifically given a directory of OCT-A images,
- it loads a pretrained model to segment them and saves the results. 
+* Pretrained model weights and code to perform vessel segmentation on OCTA images. 
 * Demonstration of results on unseen publicly available OCT-A images including montages of multiple images and images captured with different commercial scanners.
 * Demonstration of the iterative refinement effect achieved by iUNET on unseen images (please see 'segmentation_iunet' directory)
 * Code for defining all models and loss functions and training as described in the paper.
 
 ## Usages-examples
-* A commented example of how to use the pretrained models is provided in 'example_use_pretrained.py'.
-* An example of how to define and train the models is provided in 'example_use_train.py'. 
-* Loss functions and network definitions can be found in 'losses.py' and 'networks.py' respectively. The 3 architectures that are implemented are 
-(a) UNET, (b) Stacked Hourglass Network and (c) iterative UNET or iUNET.
+* A commented example of how to use the pretrained models is provided in 'example_use_pretrained.py' : specifically given a directory of OCT-A images,
+ it loads a pretrained model to segment them and saves the results. 
+* An example of how to define and train the models is provided in 'example_use_train.py'.
+* Loss functions and network definitions can be found in 'losses.py' and 'networks.py' respectively. 
+The 3 architectures that are implemented are (a) UNET, (b) Stacked Hourglass Network and (c) iterative UNET or iUNET.
 
 ![fig](misc/figs/fig1.PNG )
 
