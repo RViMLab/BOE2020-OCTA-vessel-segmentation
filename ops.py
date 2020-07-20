@@ -120,7 +120,9 @@ def crop_and_concat(x1, x2):
 
 
 def resolve_shape(tensor, rank=None, scope=None):
+
     """Fully resolves the shape of a Tensor.
+      Utility function from https://github.com/tensorflow/models/tree/master/research/deeplab
       Use as much as possible the shape components already known during graph
       creation and resolve the remaining ones during runtime.
       Args:

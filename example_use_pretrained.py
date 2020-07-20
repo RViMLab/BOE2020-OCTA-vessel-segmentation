@@ -19,6 +19,7 @@ model_ckpt_dir = 'pretrained_models/iUNET/L_3_F_64_loss_i-bce-topo_C1_2_C2_2_C3_
 path_to_files = 'web_octa_images'
 
 # 3) define the model's graph using the manager object:
+
 #   a) the 'num_layers' argument controls the number of residual blocks the encoder and decoder consists of
 #   b) the 'feature_maps_root' argument controls the number filters in the first residual block of the encoder
 #   The two above arguments should match the pretrained model's settings.

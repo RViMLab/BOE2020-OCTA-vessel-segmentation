@@ -5,17 +5,23 @@ from collections import OrderedDict
 
 
 class Reader:
-
     def __init__(self, tf_records_file, image_size=416, channels=1, do_online_augmentation=False,
-                 augmentation_details=None, do_shuffle=True, read_pathology=False,
-                 min_queue_examples=10, batch_size=1, num_threads=8, name='Reader'):
+                 augmentation_details=None, do_shuffle=True, min_queue_examples=10, batch_size=1, num_threads=8, name='Reader'):
 
         """
-        Args:
-          tf_records_file: string, tfrecords file path
-          min_queue_examples: integer, minimum number of samples to retain in the queue that provides of batches of examples
-          batch_size: integer, number of images per batch
-          num_threads: integer, number of preprocess threads
+        reader object used to read from tfrecords
+        The expected tfrecord structure for this dataset is indicated in _parse_tfrecord_features method of this class
+        :param tf_records_file: string, tfrecords file path
+        :param image_size: height and width of inputs (we assume images have h=w as in our dataset)
+        :param channels: number of channels in the images
+        :param do_online_augmentation: if True performs online augmentation
+         (for details see _get_default_augmentation_details and _augmentation methods of this class)
+        :param augmentation_details: a dictionary with the structure shown in _get_default_augmentation_details method
+        :param do_shuffle: if true shuffles the data
+        :param min_queue_examples: nteger, minimum number of samples to retain in the queue that provides of batches of examples
+        :param batch_size: batch size
+        :param num_threads: integer, number of preprocess threads
+        :param name:
         """
 
         self.tfrecords_file = tf_records_file
@@ -29,7 +35,6 @@ class Reader:
         # augmentations and shuffling
         self.do_shuffle = do_shuffle
         self.do_online_augmentation = do_online_augmentation
-        self.read_pathology = read_pathology
         self.augmentation_details = augmentation_details
 
         # augmentation settings for augmentations handled within tensorflow
@@ -74,7 +79,7 @@ class Reader:
 
     def _augmentation(self, image, mask, seed=1):
         # receives an image and a mask and applies with some set propability intensity and geometry transformations
-        # currently supports brightness, contrast and scaling
+        # supports brightness, contrast and scaling
         with tf.name_scope('brightness_distortion'):
             do_brightness = tf.random_uniform([1, 1], minval=0, maxval=1, dtype=tf.float32, seed=seed)
             image = tf.cond(do_brightness[0][0] > 1-self.augmentation_details['brightness_distortion_prob'],
@@ -113,13 +118,13 @@ class Reader:
             features = self._parse_tfrecord_features(serialized_example)
 
             # read image dimensions
-            height = tf.cast(features['height'], tf.int32)
-            width = tf.cast(features['width'], tf.int32)
-            channels = tf.cast(features['channels'], tf.int32)
+            # height = tf.cast(features['height'], tf.int32)
+            # width = tf.cast(features['width'], tf.int32)
+            # channels = tf.cast(features['channels'], tf.int32)
 
-            # read pathology
-            p = tf.cast(features['pathology'], tf.int32)
-            p_batch = tf.no_op('no_op_for_pathology')
+            # read pathology (not used in this project)
+            # p = tf.cast(features['pathology'], tf.int32)
+            # p_batch = tf.no_op('no_op_for_pathology')
 
             # read encoded image/mask and reshape and cast them to appropriate format
             image_buffer = features['image_raw']
@@ -147,9 +152,12 @@ class Reader:
                                                                  min_after_dequeue=self.min_queue_examples)
             else:  # when testing
                 image_batch, mask_batch = tf.train.batch([image, mask],
-                                                         shapes=[[self.image_size, self.image_size, self.channels], [self.image_size, self.image_size, 1]],
+                                                         shapes=[[self.image_size, self.image_size, self.channels],
+                                                                 [self.image_size, self.image_size, 1]],
                                                          batch_size=self.batch_size,
                                                          num_threads=self.num_threads,
                                                          capacity=self.min_queue_examples + 3 * self.batch_size)
 
             return image_batch, mask_batch
+
+

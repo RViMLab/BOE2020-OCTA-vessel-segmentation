@@ -1,13 +1,14 @@
 # BOE2020 OCTA vessel segmentation
-This repository contains a Python3 Tensorflow implementation of the methods described in 'Deep iteratitive vessel segmentation in OCT angiography'.
+This repository contains a Python3 Tensorflow implementation of the methods described in
+ 'Deep iteratitive vessel segmentation in OCT angiography'.
 
 ## Dependencies
    - [Tensorflow 1.9.0][tf] (the code should be compatible with any 1.x version of tensorflow).
    - [Numpy][np]
    - [Scipy][scpy] 
-   - [Opencv3][cv2] (used only for storing and reading images)
+   - [Opencv3][cv2] (us ed only for storing and reading images)
    - [matplotlib][plt] (used only for segmentation visualization)
-   - [vgg19 pretrained weights][vgg19] (these are required only for computing a perceptual loss, must be downloaded and extracted)
+   - [vgg19 pretrained weights][vgg19] (required only for computing a perceptual loss, must be downloaded and extracted)
    
 ## Contents
 * Pretrained model weights and code to perform vessel segmentation on OCTA images. 
@@ -18,8 +19,10 @@ This repository contains a Python3 Tensorflow implementation of the methods desc
 ## Usages-examples
 * A commented example of how to use the pretrained models is provided in 'example_use_pretrained.py'.
 * An example of how to define and train the models is provided in 'example_use_train.py'. 
-* Loss functions and network definitions can be found in 'losses.py' and 'networks.py' respectively 
+* Loss functions and network definitions can be found in 'losses.py' and 'networks.py' respectively. The 3 architectures that are implemented are 
+(a) UNET, (b) Stacked Hourglass Network and (c) iterative UNET or iUNET.
 
+![fig](misc/figs/fig1.PNG )
 
 [tf]: https://www.tensorflow.org/install/pip
 [np]: https://numpy.org/
@@ -56,23 +59,9 @@ BibTeX entry:
 
 Please see the LICENSE file for details.
 
-Other licences may apply for the GIFT-Grab dependencies.
-Please see the for the implications of using them with regards to licensing.
-There will be copyright in the Optical Flow software which doesn’t need active registration.
-You should ensure that there is a copyright statement in the software’s remarks and documentation, e.g. © 2020, King’s College London.
-Depending upon the origin of routines, libraries etc. used in the software’s development it might also be necessary to include other copyright statements.
-
-
-Academic researchers can download a copy and agree to a free copyright licence to use the software for non-commercial
-research purposes (but not copy, amend and distribute it).
-
-If anyone would like to explore using the software in commercial research, clinically or
-making commercial use of it they should contact you initially (and we can then discuss with the party what they wish
-to do and agree a royalty-bearing licence if appropriate, or explore a funded research collaboration).
-
 ## Acknowledgements
 [nihr]: http://www.nihr.ac.uk/
 [erc]: https://erc.europa.eu/
-This work was supported through an Invention for Innovation grant [II-LB-0716-20002] by the [National Institute for Health Research][nihr], through a grant [714562] by the.
-[European Research Council][erc] and by Sir Michael Uren Foundation.
+This work was supported through an Invention for Innovation grant [II-LB-0716-20002] by the [National Institute for Health Research][nihr],
+through a grant [714562] by the [European Research Council][erc] and by Sir Michael Uren Foundation.
 

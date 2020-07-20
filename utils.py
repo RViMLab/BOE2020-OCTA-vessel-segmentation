@@ -68,7 +68,7 @@ def project_2dpoint_on_segment(rst, cst, point):
     return dists_min
 
 
-def correctness_completeness_quality(ground_truth_list, propability_maps_list, theta=2, threshold=0.5, verbose=False):
+def correctness_completeness_quality(ground_truth_list, propability_maps_list, theta=2, threshold=0.5):
     """
 
     :param ground_truth_list: list of ground truth segmentations (do not have to be skeletonized)
@@ -158,7 +158,7 @@ def correctness_completeness_quality(ground_truth_list, propability_maps_list, t
     return correctness_sum / num_images, completeness_sum / num_images, quality_sum / num_images, qualities, correctnesses, completenesses
 
 
-#  tensorflow based utilities  #
+# tensorflow based utilities
 def identity_on_tensors(tensor1, tensor2):
     return tensor1, tensor2
 

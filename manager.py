@@ -3,7 +3,7 @@ import numpy as np
 import os
 import math
 import cv2
-# from PIL import Image
+
 import matplotlib.pyplot as plt
 
 from readers import Reader
@@ -120,7 +120,10 @@ class ModelManager:
     def _loss_def(self, loss_type, vgg_fmaps=None, vgg_weights=None):
         """
         wrapper function that sets the loss function to be used during training
-        :param loss_type:
+        :param loss_type: a string defining the loss type, below are the eligible loss types per model
+                      'UNET': ['bce', 'bce-topo']
+                     'iUNET': ['i-bce', 'i-bce-equal', 'i-bce-topo', 'i-bce-topo-equal']
+                     'SHN': ['s-bce', 's-bce-topo']
         :param vgg_fmaps: list of the vgg feature maps used for the perceptual loss
         :param vgg_weights: list of weights signifying the importance of each vgg feature map in the loss
         :return:
@@ -282,7 +285,7 @@ class ModelManager:
                 # below the two augmentation functions are implemented outside tensorflow
                 if do_online_augmentation:
                     x_value, y_value = do_deformation_off_graph(x_value, y_value, deform_prob=0.5)
-                    x_value = do_eraser_off_graph(x_value, None, eraser_prob=0.3,  boxes_max=50, boxes_min=150)
+                    x_value = do_eraser_off_graph(x_value, eraser_prob=0.5,  boxes_max=50, boxes_min=150)
 
                 train_feed = {self.x: x_value, self.y: y_value}
                 loss_batch, summary_train, _ = sess.run([self.loss, train_summary, self.train_op], feed_dict=train_feed)
@@ -305,9 +308,9 @@ class ModelManager:
                         y_test_value_list.append(y_test_value)
 
                     # run metric (computes means across the validation set)
-                    correctness, completeness, quality, _ = correctness_completeness_quality(y_test_value_list,
-                                                                                             sigmoided_out_list,
-                                                                                             threshold=0.5)
+                    correctness, completeness, quality, _, _, _ = correctness_completeness_quality(y_test_value_list,
+                                                                                                   sigmoided_out_list,
+                                                                                                   threshold=0.5)
                     new_quality = quality
                     if best_quality < new_quality:
                         diff = new_quality - best_quality
@@ -330,7 +333,7 @@ class ModelManager:
                     train_writer.add_summary(summary_metrics, i)
 
                 if i == (training_steps - 1):
-                    save_path = saver.save(sess, os.path.join(self.model_save_dir + self.name + '_' + str(i) + ".ckpt"))
+                    save_path = saver.save(sess, os.path.join(self.model_save_dir, self.name + '_' + str(i) + ".ckpt"))
                     print("Final Model saved in path: %s" % save_path)
 
             coord.request_stop()

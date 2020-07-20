@@ -126,16 +126,8 @@ def unet(x, n_heatmaps=1, num_layers=3, feature_maps_root=64, norm_type='bn',
          batch_norm_in_train_mode=True,
          name='UNET', verbose=False):
     """
-    see enc_dec_network_def for most arguments
-    :param x:
-    :param n_heatmaps:
-    :param num_layers:
-    :param feature_maps_root:
-    :param norm_type:
-    :param batch_norm_in_train_mode:
-    :param name:
-    :param verbose:
-    :return:
+    defines a unet (based on enc_dec_network_def to do it)
+    see enc_dec_network_def for an explanation of the arguments
     """
     with tf.variable_scope(name):
         logits, encoder, decoder = enc_dec_network_def(x=x,
@@ -155,6 +147,12 @@ def iunet(x, n_heatmaps=1, num_layers=3, feature_maps_root=64, norm_type='bn',
           batch_norm_in_train_mode=True,
           n_iterations=4,
           name='iUNET', verbose=False):
+    """
+    defines a iUNET (based on enc_dec_network_def to do it)
+    see enc_dec_network_def for an explanation of most arguments
+    n_iterations : refers to the number of refinement iterations the model performs
+    """
+
     # lists of logits and sigmoid-ed logits, one for each iteration
     logits = []
     sigmoided_logits = []
@@ -190,6 +188,12 @@ def shn(x, n_heatmaps=1, num_layers=3, feature_maps_root=64, norm_type='bn',
         batch_norm_in_train_mode=True,
         n_modules=4,
         name='SHN', verbose=False):
+    """
+    defines a SHN (based on enc_dec_network_def to do it)
+    see enc_dec_network_def for an explanation of most arguments
+    n_modules : refers to the number of stacked modules the model consists of
+    """
+
     # lists of logits and sigmoid-ed logits, one for each module
     logits = []
     sigmoided_logits = []

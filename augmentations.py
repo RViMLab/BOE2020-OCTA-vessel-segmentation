@@ -9,135 +9,105 @@ from scipy.ndimage.filters import gaussian_filter
 
 
 # eraser augmentation
-def do_eraser_off_graph(x, y=None, eraser_prob=0.5, boxes_max=50, boxes_min=150):
-
+def do_eraser_off_graph(x, eraser_prob=0.5, boxes_max=50, boxes_min=150):
+    """
+    Performs eraser (cutout) augmentation on x.
+    It replaces rectangular areas (boxes) in x with zero intensity pixel.
+    The number of areas is sampled from a uniform distribution within a specified interval [boxes_min, boxes_max]
+    This function is wrapping this functionality within a tensorflow session after reading x from the dataset record
+    :param x:  (B,H,W,C)
+    :param eraser_prob: propability of performing the augmentation on any given x
+    :param boxes_max: max number of rectangular areas to be zero-ed out in x
+    :param boxes_min: min number of rectangular areas to be zero-ed out in x
+    :return: x_erased: x after the areas have been zero-ed out
+    """
     do_eraser = np.random.uniform(0, 1, 1)
+    # perform the augmentation with eraser_prop propability
     if do_eraser > 1.0 - eraser_prob:
         for i in range(x.shape[0]):
-            if y is None:
-                x_erased = eraser_session(x[i, :, :, 0], propability=1.0, boxes_max=boxes_max, boxes_min=boxes_min)
-                x[i, :, :, 0] = x_erased
-            if y is not None:
-                x_erased = eraser_session(x[i, :, :, 0], y=y[i, :, :, 0], propability=1.0, boxes_max=boxes_max, boxes_min=boxes_min)
-                x[i, :, :, 0] = x_erased
+            # sample a random number of rectangular areas to be zero-ed out
+            rand_num_boxes = np.random.randint(boxes_max, boxes_min)
+            x[i, :, :, 0] = erase(x[i, :, :, 0], num_boxes=rand_num_boxes,
+                                  s_l=0.0003, s_h=0.0004, r_1=1, r_2=1)
     return x
 
 
-def eraser_session(x, propability=0.5, boxes_max=200, boxes_min=100, y=None ):
-    """
-    Performs eraser augmentation on X
-    TO be added within a session after inputs X,Y are read
-    :param x:  (B,h,w,C)
-    :param propability: how often to perfrom it
-    :param boxes_max:
-    :param boxes_min:
-    :return: x_erased
-    """
-    rand_num_boxes = np.random.randint(boxes_max, boxes_min)
-    eraser = get_random_eraser(p=propability, num_boxes=rand_num_boxes, s_l=0.0003, s_h=0.0004,
-                               v_l=0, v_h=1, r_1=1, r_2=1)
-    if y is None:
-        x_erased = eraser(x)
-        return x_erased
-    else:
-        x_erased = eraser(x, y)
-        return x_erased
+def erase(input_img, num_boxes=100, s_l=0.02, s_h=0.4, r_1=0.3, r_2=1 / 0.3):
 
-
-def get_random_eraser(p=0.5, num_boxes=100, s_l=0.02, s_h=0.4, r_1=0.3, r_2=1 / 0.3, v_l=0, v_h=255):
-    """
-    :param p: propability of performing erasing
+    """ erases a number of boxes, placed randomly within the input_img w
+    # the default settings have been tuned to apply erasing to a reasonable extent.
+    Adapted from https://github.com/yu4u/cutout-random-erasing
+    :param input_img: the input image of shape (H, W, C) or (H,W)
     :param num_boxes: number of regions
-    :param s_l: minimum proportion of erased area against input image
-    :param s_h: maximum proportion of erased area against input image
+    :param s_l: minimum fraction of erased area over input_img area
+    :param s_h: maximum fraction of erased area over input_img area
     :param r_1: minimum aspect ratio of erased area
     :param r_2: maximum aspect ratio of erased area
-    :param v_l: minimum value for erased area
-    :param v_h: maximum value for erased area
-    :param pixel_level:
-    :return:
+    :return: input_img with erased areas
     """
+    h, w = input_img.shape
+    for box in range(num_boxes):
+        while True:
+            s = np.random.uniform(s_l, s_h) * h * w  # random size
+            r = np.random.uniform(r_1, r_2)  # random aspect ratio
+            w_box = int(np.sqrt(s / r))
+            h_box = int(np.sqrt(s * r))
+            col = np.random.randint(0, w)  # random col
+            row = np.random.randint(0, h)  # random row
+            # if staying within image boundaries proceed with next box else resample another box
+            if col + w_box <= w and row + h_box <= h:
+                break
 
-    def eraser(input_img, mask_img=None):
-        img_h, img_w = input_img.shape
-        p_1 = np.random.rand()
-
-        if p_1 > p:
-            return input_img
-
-        for box in range(num_boxes):
-
-            while True:
-                s = np.random.uniform(s_l, s_h) * img_h * img_w
-                r = np.random.uniform(r_1, r_2)
-                w = int(np.sqrt(s / r))
-                h = int(np.sqrt(s * r))
-                left = np.random.randint(0, img_w)
-                top = np.random.randint(0, img_h)
-
-                if left + w <= img_w and top + h <= img_h:
-                    break
-
-            if mask_img is not None:
-                input_img[top:top + h, left:left + w] = (1 - (0.7 + np.random.uniform(-0.1, 0.1)) * mask_img[top:top + h, left:left + w]) * input_img[top:top + h, left:left + w] + \
-                                                        (1 - mask_img[top:top + h, left:left + w]) * input_img[top:top + h, left:left + w]
-
-            else:
-                input_img[top:top + h, left:left + w] = input_img.min()
-
-        return input_img
-
-    return eraser
+        # erase the box
+        input_img[row:row + h_box, col:col + w_box] = input_img.min()
+    return input_img
 
 
 # deformation augmentation
 def do_deformation_off_graph(x_value, y_value, deform_prob=0.5,
                              alpha_max=250, alpha_min=225, sigma_max=18, sigma_min=12):
+    """
+    Performs deformation augmentation on (x,y).
+    This function is wrapping this functionality within a tensorflow session after reading x from the dataset record
+    The default arguments have been tuned for OCTA images to produce reasonable augmentations
+
+    :param x_value: image of shape (B,H,W,C)
+    :param y_value: mask of shape (B,H,W,1)
+    :param deform_prob: propability of performing the augmentation on any given (x,y)
+    :param alpha_max: strength of deformation parameter max
+    :param alpha_min: strength of deformation parameter min
+    :param sigma_max: smoothness of deformation parameter max
+    :param sigma_min: smoothness of deformation parameter min
+    :return: x_value and y_value deformed
+    """
 
     for b in range(x_value.shape[0]):
         x = x_value[b, :, :, 0]
         y = y_value[b, :, :, 0]
         do_deformation = np.random.uniform(0, 1, 1)
         if do_deformation > 1 - deform_prob:
-            images_merged_deformed = elastic_deformation_session(x, y,
-                                                                 alpha_range=[alpha_min, alpha_max],
-                                                                 sigma_range=[sigma_min, sigma_max])
+            # concatenate (x,y)
+            x_y_merged = np.concatenate((x[..., None], y[..., None]), axis=2)
 
-            x_value[b, :, :, 0] = images_merged_deformed[..., 0]
-            y_value[b, :, :, 0] = images_merged_deformed[..., 1]
+            # get random alpha and sigma within specified ranges
+            random_alpha = np.random.uniform(alpha_min, alpha_max, 1)
+            random_sigma = np.random.randint(sigma_min, sigma_max)
+            x_y_deformed = elastic_deformation(x_y_merged, alpha=random_alpha, sigma=random_sigma)
+            # x_y_deformed is split back to (x,y)
+            x_value[b, :, :, 0] = x_y_deformed[..., 0]
+            y_value[b, :, :, 0] = x_y_deformed[..., 1]
         return x_value, y_value
 
 
-def elastic_deformation_session(X, Y, alpha_range, sigma_range):
-    """
-    Performs elastic deformation on pairs of X and Y with the deformation field being
-    generated using a random alpha and sigma within the specified ranges
-    TO be added within a session after inputs X,Y are read
-    :param X: image (h,w)
-    :param Y: annotation (h,w)
-    :param alpha_range: strength of deformation
-    :param sigma_range: smoothness of deformation (set higher for greated smoothness)
-    :return:
-    """
-    im_merge = np.concatenate((X[..., None], Y[..., None]), axis=2)
-    random_alpha = np.random.uniform(alpha_range[0], alpha_range[1], 1)
-    random_sigma = np.random.randint(sigma_range[0], sigma_range[1])
-    images_merged_deformed = elastic_deformation(im_merge,
-                                                 alpha=random_alpha,
-                                                 sigma=random_sigma)
-    return images_merged_deformed
-
-
-def elastic_deformation(image, sigma=15, alpha=100, random_state=None, warp_mode='constant'):
+def elastic_deformation(image, sigma=10, alpha=100, random_state=None, warp_mode='constant'):
     """   Based on https://gist.github.com/erniejunior/601cdf56d2b424757de5
         Warps image with a random defomation field generated using samples from a spatial guassian(sigma)
     :param image: (h,w,2) if deformation is to be applied on both the ground truth and
                   the input. Else it should be (h,w).
-    :param sigma: something in the range 10-20
-    :param alpha: something in the range 100-200 to avoid non-plausible deformations
+    :param sigma: controls smoothness, something in the range 10-20
+    :param alpha: controls strength something in the range 100-200 to avoid non-plausible deformations
     :param random_state: random seed for reproducibile randomness
     :param warp_mode: https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.map_coordinates.html
-                      for fundus images with a black circle around them a warp_mode = 'warp' is best!
     :return: the warped image
     """
 
@@ -170,7 +140,7 @@ def elastic_deformation(image, sigma=15, alpha=100, random_state=None, warp_mode
             # print(dy)
             dy = dy * alpha
 
-            x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))  # , np.arange(shape[2]))
+            x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
 
             indices = np.reshape(y + dy, (-1, 1)), np.reshape(x + dx, (-1, 1))
 
@@ -178,13 +148,19 @@ def elastic_deformation(image, sigma=15, alpha=100, random_state=None, warp_mode
 
 
 # scaling augmentation
-def random_scaling(img_tensor, annotations_tensor, min_relative_random_scale_change=0.9, max_realtive_random_scale_change=1.1, seed=1):
-
-    input_shape = resolve_shape(img_tensor)
-    # annotations_shape = resolve_shape(annotations_tensor)
-
+def random_scaling(x, y,
+                   min_relative_random_scale_change=0.9, max_realtive_random_scale_change=1.1, seed=1):
+    """
+    perfroms random scaling on a pair of tensors (x,y)
+    :param x: tensor of shape (b,h,w,c)
+    :param y: tensor of shape (b,h,w,c)
+    :param min_relative_random_scale_change:
+    :param max_realtive_random_scale_change:
+    :param seed:
+    :return:
+    """
+    input_shape = resolve_shape(x)
     input_shape_float = tf.to_float(input_shape)
-
     # generating the same random value for vertical and horizontal scaling
     scaling_factor = tf.random_uniform(shape=[1],
                                        minval=min_relative_random_scale_change,
@@ -193,13 +169,13 @@ def random_scaling(img_tensor, annotations_tensor, min_relative_random_scale_cha
                                        seed=seed)
 
     input_shape_scaled = tf.to_int32(tf.round(tf.multiply(input_shape_float, scaling_factor)))
+    # scale x
+    x_resized = tf.image.resize_images(images=x, size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
+    # crop  or pad to go back to original image shape
+    x_cropped_or_padded = tf.image.resize_image_with_crop_or_pad(x_resized, input_shape[0], input_shape[1])
 
-    img_resized = tf.image.resize_images(images=img_tensor, size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
-    # crop or pad to go back to original image shape
-    img_cropped_or_padded = tf.image.resize_image_with_crop_or_pad(img_resized, input_shape[0], input_shape[1])
+    # do the two above steps for y
+    y_resized = tf.image.resize_images(images=y, size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
+    y_cropped_or_padded = tf.image.resize_image_with_crop_or_pad(y_resized, input_shape[0], input_shape[1])
 
-    annotations_tensor = tf.image.resize_images(images=annotations_tensor, size=tf.stack([input_shape_scaled[0], input_shape_scaled[1]], axis=0))
-    # crop or pad to go back to annotations shape
-    annotations_tensor = tf.image.resize_image_with_crop_or_pad(annotations_tensor, input_shape[0], input_shape[1])
-
-    return img_cropped_or_padded, annotations_tensor
+    return x_cropped_or_padded, y_cropped_or_padded

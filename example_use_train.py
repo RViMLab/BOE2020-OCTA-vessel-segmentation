@@ -6,13 +6,13 @@ train_tfrecord = 'train_fold0.tfrecords'
 valid_tfrecord = 'validation_fold0.tfrecords'
 
 # get the manager object and define the graph of the network using default network settings : see ModelManager.init()
-manager = ModelManager(name='iUNET', n_iterations=2, verbose=False)
+manager = ModelManager(name='iUNET', num_layers=3, feature_maps_root=32, norm_type='bn', n_iterations=2)
 
 # using the default training setttings  (see ModelManager.train() method)
 # we set i-bce-topo to indicate the use of an iterative (i is associated with iUNET) loss
 # comprising balanced cross entropy (bce) and topological (topo) loss terms
 manager.train(train_tfrecord=train_tfrecord, validation_tfrecord=valid_tfrecord,
-              loss_type='i-bce-topo', model_dir=model_ckpt_dir)
+              loss_type='bce-topo', model_dir=model_ckpt_dir)
 
 ########################################################################################################################
 # for defining and training a SHN model we would do the following:
