@@ -3,7 +3,7 @@ import numpy as np
 import os
 import math
 import cv2
-
+import datetime
 import matplotlib.pyplot as plt
 
 from readers import Reader
@@ -41,6 +41,9 @@ class ModelManager:
             assert(n_iterations is not None)
         if name is 'SHN':
             assert(n_modules is not None)
+
+        dt = datetime.datetime.now()
+        self.date = '{}-{}-{}--{}-{}-{}'.format(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
         # to be set only if a model is trained
         self.tag = None
@@ -83,9 +86,11 @@ class ModelManager:
                 self.tag = self.tag + '_' + str(w)
 
         if self.n_iterations is not None:
-            self.tag = self.tag + '_' + str(self.n_iterations)
+            self.tag = self.tag + '_modules_{}'.format(self.n_modules)
         elif self.n_modules is not None:
-            self.tag = self.tag + '_' + str(self.n_modules)
+            self.tag = self.tag + '_iters_{}'.format(self.n_iterations)
+
+        self.tag = self.tag + '_' + self.date
 
         self.model_save_dir = os.path.join(model_dir, self.name, self.tag)
         if not os.path.exists(self.model_save_dir):
@@ -187,7 +192,8 @@ class ModelManager:
                                                                 use_vgg_loss=True, vgg_fmaps=vgg_fmaps,
                                                                 vgg_weights=vgg_weights)
 
-    def train(self, train_tfrecord, loss_type, vgg_fmaps=None, vgg_weights=None, validation_tfrecord=None,
+    def train(self, train_tfrecord, loss_type,
+              vgg_fmaps=None, vgg_weights=None, validation_tfrecord=None,
               training_steps=6000, batch_size=2,
               initial_lr=10**(-4), decay_steps=2000, decay_rate=0.5, do_online_augmentation=True,
               log_dir='', model_dir='models'):
