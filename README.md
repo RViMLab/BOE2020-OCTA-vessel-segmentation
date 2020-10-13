@@ -6,7 +6,7 @@ This repository contains a Python3 Tensorflow implementation of the methods desc
    - [Tensorflow 1.9.0][tf] (the code should be compatible with any 1.x version of tensorflow).
    - [Numpy][np]
    - [Scipy][scpy] 
-   - [Opencv3][cv2] (us ed only for storing and reading images)
+   - [Opencv3][cv2] (used only for storing and reading images)
    - [matplotlib][plt] (used only for segmentation visualization)
    - [vgg19 pretrained weights][vgg19] (required only for computing a perceptual loss, must be downloaded and extracted)
    
